@@ -126,6 +126,7 @@
                         <th>Model</th>
                         <th>Quantity</th>
                         <th>Unit Price</th>
+                        <th>Tax</th>
                         <th>Total Price</th>
                         <th>Date of Purchase</th>
                         <th>Date of Purchase Ethiopian</th>
@@ -141,6 +142,7 @@
                         <td>{{ item.model }}</td>
                         <td>{{ item.quantity }}</td>
                         <td>{{ item.unit_price }}</td>
+                        <td>{{ item.total_price - item.unit_price }}</td>
                         <td>{{ item.total_price }} ETB</td>
                         <td>{{ item.date_of_purchase }}</td>
                         <td>{{ item.date_of_purchase_ethiopian }}</td>
