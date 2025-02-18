@@ -1,4 +1,6 @@
 {% load static %}
+{% load humanize %}
+
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
 <!DOCTYPE html>
@@ -6,33 +8,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase Report</title>
+    <title>Purchased Items Report</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom Styles -->
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f3f3f3;
+            background-color: #f4f7fc;
         }
         .container {
             background-color: #ffffff;
-            padding: 30px;
+            padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
             margin-top: 50px;
         }
         h1 {
-            color: #444;
-            font-size: 2.5rem;
+            color: #333;
+            font-size: 2.8rem;
             text-align: center;
             margin-bottom: 30px;
+            font-weight: bold;
         }
         .btn-success, .btn-primary {
             padding: 12px 20px;
             font-size: 1.1rem;
             border-radius: 8px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease;
         }
         .btn-success {
             background-color: #28a745;
@@ -48,6 +50,27 @@
         .btn-primary:hover {
             background-color: #4e44c6;
         }
+        .form-inline {
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .form-inline .form-control {
+            margin-right: 10px;
+            width: auto;
+            border-radius: 8px;
+            padding: 8px;
+        }
+        .form-inline label {
+            margin-right: 10px;
+            color: #555;
+            font-size: 1rem;
+        }
+        .total-spent {
+            font-size: 1.7rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
         table {
             width: 100%;
             margin-top: 30px;
@@ -56,6 +79,7 @@
         th, td {
             padding: 15px;
             text-align: left;
+            font-size: 1rem;
         }
         th {
             background-color: #f9f9f9;
@@ -63,56 +87,64 @@
             font-weight: bold;
         }
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #fafafa;
         }
         tr:hover {
             background-color: #f1f1f1;
         }
-        .total-spent {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
+        .table-container {
+            margin-top: 20px;
+            overflow-x: auto;
         }
-
-        /* Improved form layout */
-        .form-inline .form-control {
-            margin-right: 10px;
-            width: auto;
-        }
-
-        .form-inline .btn {
-            margin-left: 10px;
-        }
-
-        /* Center buttons properly */
         .btn-container {
             text-align: center;
             margin-bottom: 20px;
         }
-
-        .table-container {
-            margin-top: 20px;
-            overflow-x: auto;
+        .btn-container a {
+            font-size: 1.2rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="my-4">Purchase Report</h1>
+        <h1>Purchase Report</h1>
 
         <div class="btn-container">
             <a href="{% url 'purchase:add_item' %}" class="btn btn-success mb-4">Add New Item</a>
         </div>
 
-        <!-- Form for filtering -->
-        <form method="GET" class="form-inline mb-4">
+        <!-- Filtering Form -->
+        <form method="GET" class="form-inline">
             {% csrf_token %}
-            {{ form.as_p }}
+
+            <label for="id_start_date">Start Date:</label>
+            {{ form.start_date }}
+
+            <label for="id_end_date">End Date:</label>
+            {{ form.end_date }}
+
+            <!-- Category Dropdown -->
+            <label for="id_item_category">Category:</label>
+            <select name="item_category" class="form-control">
+                <option value="">All</option>
+                {% for category in categories %}
+                    <option value="{{ category }}" {% if request.GET.item_category == category %}selected{% endif %}>{{ category }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Status Dropdown -->
+            <label for="id_status">Status:</label>
+            <select name="status" class="form-control">
+                <option value="">All</option>
+                {% for status in statuses %}
+                    <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>{{ status }}</option>
+                {% endfor %}
+            </select>
+
             <button type="submit" class="btn btn-primary">Generate Report</button>
         </form>
-        
 
-        <h3 class="total-spent">Total Spent: {{ total_spent }} ETB</h3>
+        <h3 class="total-spent">Total Spent: {{ total_spent|floatformat:2|intcomma }} ETB</h3>
 
         <!-- Table Displaying Items -->
         <div class="table-container">
@@ -120,32 +152,34 @@
                 <thead>
                     <tr>
                         <th>Order</th>
-                        <th>class</th>
+                        <th>Category</th>
                         <th>Item Name</th>
-                        <th>Optional Name</th>
+                        <th>Quantity</th>
                         <th>Seller Name</th>
                         <th>Model</th>
-                        <th>Unit Price</th>
-                        <th>Tax</th>
+                        <th>Unit Price Before VAT</th>
+                        <th>VAT</th>
                         <th>Total Price</th>
-                        <th>Date of Purchase</th>
-                        <th>Date of Purchase Ethiopian</th>
+                        <th>Date of Purchase (GC)</th>
+                        <th>Date of Purchase (EC)</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in items %}
+                    {% for item in items reversed %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ item.item_class }}</td>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.custom_name }}</td>
+                        <td>{{ item.item_category }}</td>
+                        <td>{{ item.item_name }}</td>
+                        <td>{{ item.quantity }}</td>
                         <td>{{ item.seller_name }}</td>
                         <td>{{ item.model }}</td>
-                        <td>{{ item.unit_price }}</td>
-                        <td>{{ item.total_price - item.unit_price }}</td>
-                        <td>{{ item.total_price }} ETB</td>
+                        <td>{{ item.unit_price_before_vat|floatformat:2|intcomma }}</td>
+                        <td class="vat-value" data-total="{{ item.total_price }}" data-quantity="{{ item.quantity }}" data-unit="{{ item.unit_price_before_vat }}"></td>
+                        <td>{{ item.total_price|floatformat:2|intcomma }} ETB</td>
                         <td>{{ item.date_of_purchase }}</td>
                         <td>{{ item.date_of_purchase_ethiopian }}</td>
+                        <td>{{ item.status }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -153,18 +187,19 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Set the hidden custom_name value here
-            document.querySelector('input[name="custom_name"]').value = "Dynamic Value";
+            document.querySelectorAll('.vat-value').forEach(function(td) {
+                const totalPrice = parseFloat(td.getAttribute('data-total')) || 0;
+                const quantity = parseFloat(td.getAttribute('data-quantity')) || 0;
+                const unitPrice = parseFloat(td.getAttribute('data-unit')) || 0;
+                const vat = totalPrice - (quantity * unitPrice);
+                td.textContent = vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ETB';
+            });
         });
     </script>
 </body>
 </html>
-
-
-
-
-

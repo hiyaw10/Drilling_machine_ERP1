@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
      'inventory',
      "items_used",
+     'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [

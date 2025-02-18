@@ -12,7 +12,7 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f7f7f7; /* Neutral background */
+            background-color: #f7f7f7;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -25,14 +25,14 @@
             background-color: #fff;
             padding: 30px;
             border-radius: 8px;
-            border: 4px solid #6f42c1; /* Purple border for emphasis */
+            border: 4px solid #6f42c1;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 600px; /* More compact form */
+            max-width: 600px;
             width: 100%;
         }
 
         h1 {
-            color: #6f42c1; /* Purple title */
+            color: #6f42c1;
             font-size: 1.8rem;
             text-align: center;
             margin-bottom: 30px;
@@ -42,16 +42,17 @@
             border-radius: 6px;
             padding: 12px;
             font-size: 1rem;
-            border: 1px solid #ccc; /* Light border for inputs */
+            border: 1px solid #ccc;
         }
 
         .form-control:focus {
-            border-color: #007bff; /* Blue border on focus */
+            border-color: #007bff;
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
 
-        .btn-submit {
-            background-color: #6f42c1; /* Purple background */
+        .btn-submit,
+        .btn-report {
+            background-color: #6f42c1;
             color: #fff;
             border: none;
             border-radius: 6px;
@@ -62,12 +63,13 @@
             transition: background-color 0.3s;
         }
 
-        .btn-submit:hover {
-            background-color: #5a2e9f; /* Darker purple on hover */
+        .btn-submit:hover,
+        .btn-report:hover {
+            background-color: #5a2e9f;
         }
 
         .form-group {
-            margin-bottom: 20px; /* Even space between fields */
+            margin-bottom: 20px;
         }
 
         .form-group label {
@@ -81,14 +83,13 @@
             width: 100%;
         }
 
-        /* Ensure inputs are appropriately spaced */
-        .form-group input[type="text"],
-        .form-group select {
-            padding: 12px;
+        .custom-field {
+            display: none;
         }
 
-        .custom-field {
-            display: none; /* Hidden by default */
+        .btn-report {
+            background-color: #28a745; /* Green button for report */
+            margin-top: 15px; /* Additional spacing between the buttons */
         }
     </style>
 </head>
@@ -106,6 +107,9 @@
             </div>
             
             <button type="submit" class="btn btn-submit">Add Item</button>
+            
+            <!-- Navigation Button to Report -->
+            <a href="/purchase/report" class="btn btn-report">Go to Report</a>
         </form>
     </div>
 
@@ -119,7 +123,7 @@
             $('input[name="date_of_purchase"]').datepicker({
                 dateFormat: 'mm/dd/yy',
                 changeMonth: true,
-                changeYear: true
+                changeYear: true,
             });
 
             // Toggle Custom Name Field

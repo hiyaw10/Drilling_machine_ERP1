@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import ItemsUsedForm
 from .models import ItemsUsed  # Import the ItemsUsed model
+from purchase.forms import ItemForm
+
+
 
 def add_items_used(request):
     if request.method == 'POST':
@@ -31,9 +34,8 @@ def add_items_used(request):
     return render(request, 'items_used/add_items_used.html', {'form': form})
 
 
-from django.shortcuts import render
-from .models import ItemsUsed  # Adjust model name as needed
-
 def items_used_report(request):
-    items_used = ItemsUsed.objects.all()
+    """Displays a permanent log of all items used."""
+    items_used = ItemsUsed.objects.all().order_by('-date_of_use')  # Keep a history sorted by date
     return render(request, 'items_used/items_used_report.html', {'items_used': items_used})
+

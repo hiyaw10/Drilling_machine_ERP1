@@ -14,5 +14,5 @@ class InventoryItem(models.Model):
             super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.purchased_item.name} - {self.quantity_in_stock} in stock"
+        return f"{self.purchased_item.item_name} - {self.quantity_in_stock} in stock"
     # inventory/models.py
