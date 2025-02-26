@@ -17,48 +17,64 @@ def add_item(request):
             return render(request, 'purchase/add_item.html', {'form': form, 'errors': form.errors})
     else:
         form = ItemForm()
-        # If needed, set a default initial value for 'custom_name'
         form.fields['custom_item_name'].initial = 'Enter a custom name here if needed'
 
     return render(request, 'purchase/add_item.html', {'form': form})
 
 
+# Generate Report View
+from django.shortcuts import render, redirect
+from django.db.models import Sum, F
+from .models import Item
+from .forms import ItemForm, ReportForm
+from decimal import Decimal
+
+VAT_RATE = Decimal("0.15")  # 15% VAT
 
 def generate_report(request):
     items = Item.objects.all()
-    form = ReportForm(request.GET)
+    form = ReportForm(request.GET or None)
 
-    # Get distinct categories & statuses for dropdowns
-    categories = Item.objects.values_list('item_category', flat=True).distinct()
-    statuses = Item.objects.values_list('status', flat=True).distinct()
-    
+    # Fetch distinct values and remove duplicates
+    categories = sorted(set(Item.objects.exclude(item_category__isnull=True).values_list('item_category', flat=True)))
+    statuses = sorted(set(Item.objects.exclude(status__isnull=True).values_list('status', flat=True)))
+    receipts = sorted(set(Item.objects.exclude(Receipt__isnull=True).values_list('Receipt', flat=True)))
+    sellers = sorted(set(Item.objects.exclude(seller_name__isnull=True).values_list('seller_name', flat=True)))
+    item_names = sorted(set(Item.objects.exclude(item_name__isnull=True).values_list('item_name', flat=True)))
 
     if form.is_valid():
         start_date = form.cleaned_data.get('start_date')
         end_date = form.cleaned_data.get('end_date')
-        category = request.GET.get('item_category', None)
-        status = request.GET.get('status', None)
+        category = request.GET.get('item_category', '').strip()
+        status = request.GET.get('status', '').strip()
+        receipt = request.GET.get('Receipt', '').strip()
+        seller_name = request.GET.get('seller_name', '').strip()
+        item_name = request.GET.get('item_name', '').strip()
 
         if start_date and end_date:
             items = items.filter(date_of_purchase__range=[start_date, end_date])
-
         if category:
             items = items.filter(item_category=category)
-
         if status:
             items = items.filter(status=status)
+        if receipt:
+            items = items.filter(Receipt=receipt)
+        if seller_name:
+            items = items.filter(seller_name=seller_name)
+        if item_name:
+            items = items.filter(item_name=item_name)
 
-    total_spent = round(items.aggregate(total=Sum('total_price'))['total'] or 0, 2)
+    
 
-    return render(
-        request, 
-        'purchase/report.html', 
-        {
-            'form': form, 
-            'items': items, 
-            'total_spent': total_spent, 
-            'categories': categories, 
-            'statuses': statuses
-        }
-    )
+    total_spent = round(items.aggregate(total=Sum('total_price'))['total'] or Decimal(0), 2)
 
+    return render(request, 'purchase/report.html', {
+        'items': items,
+        'form': form,
+        'categories': categories,
+        'statuses': statuses,
+        'receipts': receipts,
+        'sellers': sellers,
+        'item_names': item_names,
+        'total_spent': total_spent,
+    })

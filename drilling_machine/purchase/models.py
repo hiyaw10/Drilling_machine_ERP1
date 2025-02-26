@@ -23,12 +23,40 @@ def create_default_categories(sender, **kwargs):
 
 
 class Item(models.Model):
+   
     BANK_CHOICES = [
-        ('CBE', 'Commercial Bank of Ethiopia'),
-        ('Abyssinia Bank', 'Abyssinia Bank'),
-        ('Oromia Bank', 'Oromia Bank'),
-    ]
-    
+    ('CBE', 'Commercial Bank of Ethiopia'),
+    ('Awash Bank', 'Awash International Bank'),
+    ('Dashen Bank', 'Dashen Bank S.C.'),
+    ('Bank of Abyssinia', 'Bank of Abyssinia S.C.'),
+    ('Wegagen Bank', 'Wegagen Bank S.C.'),
+    ('Nib International Bank', 'Nib International Bank S.C.'),
+    ('Hibret Bank', 'Hibret Bank S.C.'),
+    ('Oromia Bank', 'Oromia Bank S.C.'),
+    ('Cooperative Bank of Oromia', 'Cooperative Bank of Oromia'),
+    ('Berhan Bank', 'Berhan International Bank S.C.'),
+    ('Bunna Bank', 'Bunna International Bank S.C.'),
+    ('Zemen Bank', 'Zemen Bank S.C.'),
+    ('Enat Bank', 'Enat Bank S.C.'),
+    ('Global Bank Ethiopia', 'Global Bank Ethiopia S.C.'),
+    ('Addis International Bank', 'Addis International Bank S.C.'),
+    ('Abay Bank', 'Abay Bank S.C.'),
+    ('Shabelle Bank', 'Shabelle Bank S.C.'),
+    ('ZamZam Bank', 'ZamZam Bank S.C.'),
+    ('Goh Betoch Bank', 'Goh Betoch Bank S.C.'),
+    ('Ahadu Bank', 'Ahadu Bank S.C.'),
+    ('Hijra Bank', 'Hijra Bank S.C.'),
+    ('Tsehay Bank', 'Tsehay Bank S.C.'),
+    ('Siinqee Bank', 'Siinqee Bank S.C.'),
+    ('Tsedey Bank', 'Tsedey Bank S.C.'),
+    ('Gadaa Bank', 'Gadaa Bank S.C.'),
+    ('Amhara Bank', 'Amhara Bank S.C.'),
+    ('Rammis Bank', 'Rammis Bank S.C.'),
+    ('Siket Bank', 'Siket Bank S.C.'),
+    ('Sidama Bank', 'Sidama Bank S.C.'),
+    ('Omo Bank', 'Omo Bank S.C.'),
+]
+
     CATEGORY_CHOICES = [
         ('with', 'With'),
         ('without', 'Without'),
@@ -57,7 +85,7 @@ class Item(models.Model):
     item_name = models.CharField(max_length=100, choices=CATEGORY_NAME_CHOICES)  # Updated field name
     custom_item_name = models.CharField(max_length=100, blank = True)  # New field for custom name
     item_category = models.CharField(max_length=50, choices=ITEM_CATEGORY_CHOICES)  # Renamed field for clarity
-    credit_paid = models.CharField(max_length=100, choices=[('Credit', 'Credit'), ('Paid', 'Paid')])  # New field for payment status
+    payment_type = models.CharField(max_length=100, choices=[('Credit', 'Credit'), ('Paid', 'Paid')])  # New field for payment status
     remark = models.TextField(blank=True, null=True)  # New text field for remarks
     unit_price_before_vat = models.DecimalField(max_digits=10, decimal_places=2)  # Renamed unit price field
     status = models.CharField(max_length=100, choices=[('Finished', 'Finished'), ('Unfinished', 'Unfinished')], blank=True)  # New status field for finished/unfinished
@@ -66,7 +94,7 @@ class Item(models.Model):
     seller_name = models.CharField(max_length=100, blank=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Total price is nullable
     date_of_purchase = models.DateField()
-    date_of_purchase_ethiopian = models.CharField(max_length=50, blank=True)
+    date_of_bank_transfer = models.DateField(null=True, blank=True)
     serial_number = models.CharField(max_length=100, unique=True, blank=True)
     model = models.CharField(max_length=100, blank=True, null=True)  # Make model optional
     color = models.CharField(max_length=100, blank=True, null=True)

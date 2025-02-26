@@ -126,6 +126,14 @@
                 changeYear: true,
             });
 
+            $('input[name="date_of_bank_transfer"]').datepicker({
+                dateFormat: 'mm/dd/yy',
+                changeMonth: true,
+                changeYear: true,
+            });
+
+            
+
             // Toggle Custom Name Field
             $('#id_name').change(function() {
                 if ($(this).val() === "Other") {

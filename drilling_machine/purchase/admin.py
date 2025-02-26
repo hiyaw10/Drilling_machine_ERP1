@@ -16,14 +16,13 @@ class ItemAdmin(admin.ModelAdmin):
         'date_of_purchase',         # Assuming 'date_of_purchase' exists in Item model
         'status',                   # Added status field               # Added bank_name field
         'remark',                   # Added remark field
-        'credit_paid',              # Added credit_paid field
-    ]
+        'payment_type',              ]
     
     # Enabling search functionality for item_name and serial_number
     search_fields = ['item_name', 'serial_number', 'fs_number']
     
-    # Filtering by item_category, credit_paid, status, and date_of_purchase
-    list_filter = ['item_category', 'credit_paid', 'status', 'date_of_purchase']
+    # Filtering by item_category, 'payment_type', status, and date_of_purchase
+    list_filter = ['item_category', 'payment_type', 'status', 'date_of_purchase']
 
     # Optional: If item_category is a ForeignKey, use its related field for display
     def item_category(self, obj):

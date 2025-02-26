@@ -21,10 +21,10 @@ class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
         fields = [
-            'item_category','item_name','custom_item_name','FS_number', 'credit_paid', 'Transferred_from_bank_name',
-            'Transferred_from_sender_name','Transferred_from_account_number', 'Transferred_to_bank_name', 'Transferred_to_receiver_name','Transferred_to_account_number',
-            'serial_number', 'model', 'color', 'brand', 'quantity', 'unit', 'seller_name', "Receipt",'unit_price_before_vat', 
-            'status', 'date_of_purchase', 'date_of_purchase_ethiopian', 'remark'
+            'item_category','item_name','custom_item_name','seller_name', "Receipt",'FS_number', 
+            'serial_number', 'model', 'color', 'brand', 'quantity', 'unit','unit_price_before_vat', 
+         'date_of_purchase', 'payment_type', 'Transferred_from_bank_name',
+            'Transferred_from_sender_name','Transferred_from_account_number', 'Transferred_to_bank_name', 'Transferred_to_receiver_name','Transferred_to_account_number', 'date_of_bank_transfer','status', 'remark',
         ]
     
     custom_item_name = forms.CharField(required=False, max_length=100)
@@ -35,6 +35,10 @@ class ItemForm(forms.ModelForm):
     date_of_purchase = forms.DateField(
         widget=forms.TextInput(attrs={'class': 'datepicker', 'placeholder': 'Select Date'})
     )
+    date_of_bank_transfer = forms.DateField(
+        widget=forms.TextInput(attrs={'class': 'datepicker', 'placeholder': 'Select Date'})
+    )
+    
     total_price = forms.DecimalField(
         max_digits=20, 
         decimal_places=2, 

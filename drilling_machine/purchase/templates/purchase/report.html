@@ -107,41 +107,91 @@
 </head>
 <body>
     <div class="container">
-        <h1>Purchase Report</h1>
+        <h1>Purchased Items Page</h1>
 
         <div class="btn-container">
             <a href="{% url 'purchase:add_item' %}" class="btn btn-success mb-4">Add New Item</a>
         </div>
 
         <!-- Filtering Form -->
-        <form method="GET" class="form-inline">
+        <form method="GET" class="form-container">
             {% csrf_token %}
+            
+            <div class="row mb-3">
+                <!-- Start Date -->
+                <div class="col-md-3">
+                    <label for="id_start_date">Start Date:</label>
+                    {{ form.start_date }}
+                </div>
 
-            <label for="id_start_date">Start Date:</label>
-            {{ form.start_date }}
+                <!-- End Date -->
+                <div class="col-md-3">
+                    <label for="id_end_date">End Date:</label>
+                    {{ form.end_date }}
+                </div>
 
-            <label for="id_end_date">End Date:</label>
-            {{ form.end_date }}
+                <!-- Category -->
+                <div class="col-md-3">
+                    <label for="id_item_category">Category:</label>
+                    <select name="item_category" class="form-control">
+                        <option value="">All</option>
+                        {% for category in categories %}
+                            <option value="{{ category }}" {% if request.GET.item_category == category %}selected{% endif %}>{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <!-- Category Dropdown -->
-            <label for="id_item_category">Category:</label>
-            <select name="item_category" class="form-control">
-                <option value="">All</option>
-                {% for category in categories %}
-                    <option value="{{ category }}" {% if request.GET.item_category == category %}selected{% endif %}>{{ category }}</option>
-                {% endfor %}
-            </select>
+                <!-- Seller Name -->
+                <div class="col-md-3">
+                    <label for="id_seller_name">Seller Name:</label>
+                    <select name="seller_name" class="form-control">
+                        <option value="">All</option>
+                        {% for seller in sellers %}
+                            <option value="{{ seller }}" {% if request.GET.seller_name == seller %}selected{% endif %}>{{ seller }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
 
-            <!-- Status Dropdown -->
-            <label for="id_status">Status:</label>
-            <select name="status" class="form-control">
-                <option value="">All</option>
-                {% for status in statuses %}
-                    <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>{{ status }}</option>
-                {% endfor %}
-            </select>
+            <div class="row mb-3">
+                <!-- Status (Now in Second Row) -->
+                <div class="col-md-3">
+                    <label for="id_status">Status:</label>
+                    <select name="status" class="form-control">
+                        <option value="">All</option>
+                        {% for status in statuses %}
+                            <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>{{ status }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <button type="submit" class="btn btn-primary">Generate Report</button>
+                <!-- Receipt -->
+                <div class="col-md-3">
+                    <label for="id_receipt">Receipt:</label>
+                    <select name="receipt" class="form-control">
+                        <option value="">All</option>
+                        {% for receipt in receipts %}
+                            <option value="{{ receipt }}" {% if request.GET.receipt == receipt %}selected{% endif %}>{{ receipt }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Item Name -->
+                <div class="col-md-3">
+                    <label for="id_item_name">Item Name:</label>
+                    <select name="item_name" class="form-control">
+                        <option value="">All</option>
+                        {% for item in item_names %}
+                            <option value="{{ item }}" {% if request.GET.item_name == item %}selected{% endif %}>{{ item }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Centered Generate Report Button -->
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary">Generate Report</button>
+            </div>
         </form>
 
         <h3 class="total-spent">Total Spent: {{ total_spent|floatformat:2|intcomma }} ETB</h3>
@@ -161,7 +211,7 @@
                         <th>VAT</th>
                         <th>Total Price</th>
                         <th>Date of Purchase (GC)</th>
-                        <th>Date of Purchase (EC)</th>
+                        <th>Date of Bank Transfer</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -178,7 +228,7 @@
                         <td class="vat-value" data-total="{{ item.total_price }}" data-quantity="{{ item.quantity }}" data-unit="{{ item.unit_price_before_vat }}"></td>
                         <td>{{ item.total_price|floatformat:2|intcomma }} ETB</td>
                         <td>{{ item.date_of_purchase }}</td>
-                        <td>{{ item.date_of_purchase_ethiopian }}</td>
+                        <td>{{ item.date_of_bank_transfer }}</td>
                         <td>{{ item.status }}</td>
                     </tr>
                     {% endfor %}
@@ -196,10 +246,13 @@
                 const totalPrice = parseFloat(td.getAttribute('data-total')) || 0;
                 const quantity = parseFloat(td.getAttribute('data-quantity')) || 0;
                 const unitPrice = parseFloat(td.getAttribute('data-unit')) || 0;
+                
+                // Calculate VAT: totalPrice = (quantity * unitPrice) + VAT, so VAT = totalPrice - (quantity * unitPrice)
                 const vat = totalPrice - (quantity * unitPrice);
+                
+                // Set VAT value with formatting
                 td.textContent = vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ETB';
             });
         });
     </script>
-</body>
-</html>
+    
