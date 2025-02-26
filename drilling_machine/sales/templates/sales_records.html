@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Sales Records{% endblock %}
+
+{% block content %}
+<h1>Sales Records</h1>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<ul>
+    {% for record in sales_records %}
+        <li>{{ record.fs_number }} - {{ record.drilled_meters }} meters - Buyer: {{ record.buyer_name }}</li>
+    {% empty %}
+        <li>No sales records available.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

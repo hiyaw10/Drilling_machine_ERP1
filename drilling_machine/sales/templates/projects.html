@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+<h1>Projects</h1>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<ul>
+    {% for project in projects %}
+        <li>{{ project.project_name }} - Contract: {{ project.contract.business_name }}</li>
+    {% empty %}
+        <li>No projects available.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
