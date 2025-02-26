@@ -42,7 +42,7 @@ INSTALLED_APPS = [
      'inventory',
      "items_used",
      'django.contrib.humanize',
-     'sales',
+     
     
 ]
 
