@@ -42,6 +42,9 @@ INSTALLED_APPS = [
      'inventory',
      "items_used",
      'django.contrib.humanize',
+     'sales',
+    
+     
      
     
 ]
@@ -77,6 +80,8 @@ TEMPLATES = [
 WSGI_APPLICATION = "drilling_machine.wsgi.application"
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 

@@ -51,10 +51,12 @@ def generate_report(request):
         seller_name = request.GET.get('seller_name', '').strip()
         item_name = request.GET.get('item_name', '').strip()
 
+
         if start_date and end_date:
             items = items.filter(date_of_purchase__range=[start_date, end_date])
         if category:
-            items = items.filter(item_category=category)
+            items = items.filter(item_category=category) 
+        
         if status:
             items = items.filter(status=status)
         if receipt:

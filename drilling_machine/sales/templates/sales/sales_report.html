@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report</title>
+</head>
+<body>
+    <h2>Sales Report</h2>
+
+    <form method="GET">
+        FS Number: <input type="text" name="fs_number">
+        Start Date: <input type="date" name="start_date">
+        End Date: <input type="date" name="end_date">
+        Buyer Name: <input type="text" name="buyer_name">
+        TIN Number: <input type="text" name="tin_number">
+        Bank From: <input type="text" name="bank_from">
+        Bank To: <input type="text" name="bank_to">
+        <button type="submit">Filter</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>FS Number</th>
+            <th>Date</th>
+            <th>Project</th>
+            <th>Drilled Meters</th>
+            <th>Total Hours</th>
+            <th>Total Price (with VAT)</th>
+            <th>Buyer Name</th>
+        </tr>
+        {% for sale in sales %}
+        <tr>
+            <td>{{ sale.fs_number }}</td>
+            <td>{{ sale.date }}</td>
+            <td>{{ sale.project.name }}</td>
+            <td>{{ sale.drilled_meters }}</td>
+            <td>{{ sale.total_hours }}</td>
+            <td>{{ sale.total_price_with_vat }}</td>
+            <td>{{ sale.buyer_name }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

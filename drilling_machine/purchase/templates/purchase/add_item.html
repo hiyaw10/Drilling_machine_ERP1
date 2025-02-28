@@ -7,12 +7,13 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
 
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f7f7f7;
+            background-color: #f8f9fa;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -22,60 +23,83 @@
         }
 
         .container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            border: 4px solid #6f42c1;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
             max-width: 600px;
             width: 100%;
+            border: 1px solid #e0e0e0;
         }
 
         h1 {
             color: #6f42c1;
-            font-size: 1.8rem;
+            font-size: 2rem;
+            font-weight: 600;
             text-align: center;
             margin-bottom: 30px;
         }
 
         .form-control {
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 12px;
             font-size: 1rem;
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
         .form-control:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            border-color: #6f42c1;
+            box-shadow: 0 0 8px rgba(111, 66, 193, 0.3);
         }
 
         .btn-submit,
         .btn-report {
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-submit {
             background-color: #6f42c1;
             color: #fff;
             border: none;
-            border-radius: 6px;
-            padding: 12px;
-            font-size: 1.1rem;
-            width: 100%;
-            margin-top: 20px;
-            transition: background-color 0.3s;
         }
 
-        .btn-submit:hover,
-        .btn-report:hover {
+        .btn-submit:hover {
             background-color: #5a2e9f;
+            transform: translateY(-2px);
+        }
+
+        .btn-report {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            margin-top: 15px;
+        }
+
+        .btn-report:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .form-group label {
-            font-size: 1.1rem;
-            color: #555;
+            font-size: 1rem;
+            color: #495057;
+            font-weight: 500;
             margin-bottom: 8px;
+        }
+
+        .custom-field {
+            display: none;
+            margin-top: 10px;
         }
 
         .form-group input,
@@ -83,13 +107,10 @@
             width: 100%;
         }
 
-        .custom-field {
-            display: none;
-        }
-
-        .btn-report {
-            background-color: #28a745; /* Green button for report */
-            margin-top: 15px; /* Additional spacing between the buttons */
+        .form-group input[type="date"],
+        .form-group input[type="text"],
+        .form-group select {
+            height: 45px;
         }
     </style>
 </head>
@@ -131,8 +152,6 @@
                 changeMonth: true,
                 changeYear: true,
             });
-
-            
 
             // Toggle Custom Name Field
             $('#id_name').change(function() {

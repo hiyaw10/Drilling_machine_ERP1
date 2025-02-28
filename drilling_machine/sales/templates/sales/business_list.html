@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business List</title>
+</head>
+<body>
+    <h2>Business List</h2>
+    <a href="{% url 'add_business' %}">Add Business</a>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Company</th>
+            <th>Agreed Meters</th>
+        </tr>
+        {% for business in businesses %}
+        <tr>
+            <td>{{ business.name }}</td>
+            <td>{{ business.company_name }}</td>
+            <td>{{ business.agreed_meters }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
