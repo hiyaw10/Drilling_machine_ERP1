@@ -16,7 +16,10 @@ class ItemAdmin(admin.ModelAdmin):
         'date_of_purchase',         # Assuming 'date_of_purchase' exists in Item model
         'status',                   # Added status field               # Added bank_name field
         'remark',                   # Added remark field
-        'payment_type',              ]
+        'payment_type',
+        'payment_transaction_type', 
+        'receipt_file',
+        'bank_transfer_file']
     
     # Enabling search functionality for item_name and serial_number
     search_fields = ['item_name', 'serial_number', 'fs_number']

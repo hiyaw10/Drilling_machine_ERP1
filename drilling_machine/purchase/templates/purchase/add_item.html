@@ -22,7 +22,7 @@
             margin: 0;
         }
 
-        .container {
+        .container-fluid {
             background-color: #ffffff;
             padding: 40px;
             border-radius: 12px;
@@ -85,42 +85,14 @@
             background-color: #218838;
             transform: translateY(-2px);
         }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            font-size: 1rem;
-            color: #495057;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .custom-field {
-            display: none;
-            margin-top: 10px;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-        }
-
-        .form-group input[type="date"],
-        .form-group input[type="text"],
-        .form-group select {
-            height: 45px;
-        }
     </style>
 </head>
 <body>
-
-    <div class="container">
+    <div class="container-fluid">
         <h1>Add Purchased Item</h1>
 
         <!-- Form to Add Purchased Item -->
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data" role="form" autocomplete="off">
             {% csrf_token %}
             
             <div class="form-group">
@@ -140,27 +112,22 @@
 
     <script>
         $(document).ready(function() {
-            // Date Picker Initialization
-            $('input[name="date_of_purchase"]').datepicker({
-                dateFormat: 'mm/dd/yy',
-                changeMonth: true,
-                changeYear: true,
-            });
+            // Date Picker Initialization (only if input exists)
+            if ($('input[name="date_of_purchase"]').length) {
+                $('input[name="date_of_purchase"]').datepicker({
+                    dateFormat: 'mm/dd/yy',
+                    changeMonth: true,
+                    changeYear: true,
+                });
+            }
 
-            $('input[name="date_of_bank_transfer"]').datepicker({
-                dateFormat: 'mm/dd/yy',
-                changeMonth: true,
-                changeYear: true,
-            });
-
-            // Toggle Custom Name Field
-            $('#id_name').change(function() {
-                if ($(this).val() === "Other") {
-                    $('#id_custom_name').fadeIn();
-                } else {
-                    $('#id_custom_name').fadeOut();
-                }
-            });
+            if ($('input[name="date_of_bank_transfer"]').length) {
+                $('input[name="date_of_bank_transfer"]').datepicker({
+                    dateFormat: 'mm/dd/yy',
+                    changeMonth: true,
+                    changeYear: true,
+                });
+            }
         });
     </script>
 </body>

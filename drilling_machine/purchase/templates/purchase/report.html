@@ -203,25 +203,31 @@
         <div class="table-container">
             <table class="table table-bordered table-striped" id="purchasedItemsTable">
                 <thead>
+                    <style>
+                        .table thead th {
+                            text-transform: none !important; /* Override uppercase styling */
+                        }
+                    </style>
                     <tr>
                         <th>Order</th>
-                        <th>Date of Purchase (GC)</th>
+                        <th>Date of purchase (GC)</th>
                         <th>Category</th>
-                        <th>Item Name</th>
+                        <th>Item name</th>
                         <th>Quantity</th>
-                        <th>Seller Name</th>
+                        <th>Seller name</th>
                         <th>Model</th>
-                        <th>Unit Price Before VAT</th>
+                        <th>Unit price before VAT</th>
                         <th>VAT</th>
-                        <th>Total Price</th>
-                        <th>Date of Bank Transfer</th>
+                        <th>Total price</th>
+                        <th>Date of bank transfer</th>
                         <th>
-                            FS Number
+                            FS number
                             <button id="sortFsNumberBtn" class="btn btn-sm btn-outline-secondary ml-2">
                                 <i class="fas fa-sort"></i> Sort
                             </button>
                         </th>
                         <th>Status</th>
+                        <th>Receipt</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -265,12 +271,12 @@
                         <td>{{ item.date_of_bank_transfer }}</td>
                         <td>{{ item.FS_number }}</td>
                         <td>{{ item.status }}</td>
+                        <td>{{ item.Receipt }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    </div>
 
     <!-- Bootstrap Modal -->
     <div class="modal fade" id="itemDetailModal" tabindex="-1" aria-labelledby="itemDetailModalLabel" aria-hidden="true">

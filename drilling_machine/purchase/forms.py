@@ -23,8 +23,8 @@ class ItemForm(forms.ModelForm):
         fields = [
             'item_category','item_name','custom_item_name','seller_name', "Receipt",'FS_number', 
             'serial_number', 'model', 'color', 'brand', 'quantity', 'unit','unit_price_before_vat', 
-         'date_of_purchase', 'payment_type', 'Transferred_from_bank_name',
-            'Transferred_from_sender_name','Transferred_from_account_number', 'Transferred_to_bank_name', 'Transferred_to_receiver_name','Transferred_to_account_number', 'date_of_bank_transfer','status', 'remark',
+         'date_of_purchase', 'payment_type','payment_transaction_type', 'Transferred_from_bank_name',
+            'Transferred_from_sender_name','Transferred_from_account_number', 'Transferred_to_bank_name', 'Transferred_to_receiver_name','Transferred_to_account_number', 'date_of_bank_transfer','status', 'remark','receipt_file', 'bank_transfer_file'
         ]
     
     custom_item_name = forms.CharField(required=False, max_length=100)
@@ -39,6 +39,10 @@ class ItemForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'datepicker', 'placeholder': 'Select Date'})
     )
     
+    widgets = {
+            'receipt_file': forms.ClearableFileInput(attrs={'accept': '.pdf,.docx,.jpg,.jpeg,.png'}),
+            'bank_transfer_file': forms.ClearableFileInput(attrs={'accept': '.pdf,.docx,.jpg,.jpeg,.png'}),
+        }
     total_price = forms.DecimalField(
         max_digits=20, 
         decimal_places=2, 

@@ -21,7 +21,11 @@ def create_default_categories(sender, **kwargs):
     for category_name in categories:
         Category.objects.get_or_create(item_name=category_name)
 
+def upload_to_receipts(instance, filename):
+    return f"receipts/{instance.serial_number}/{filename}"
 
+def upload_to_bank_transfers(instance, filename):
+    return f"bank_transfers/{instance.serial_number}/{filename}"
 class Item(models.Model):
    
     BANK_CHOICES = [
@@ -85,7 +89,8 @@ class Item(models.Model):
     item_name = models.CharField(max_length=100, choices=CATEGORY_NAME_CHOICES)  # Updated field name
     custom_item_name = models.CharField(max_length=100, blank = True)  # New field for custom name
     item_category = models.CharField(max_length=50, choices=ITEM_CATEGORY_CHOICES)  # Renamed field for clarity
-    payment_type = models.CharField(max_length=100, choices=[('Credit', 'Credit'), ('Paid', 'Paid')])  # New field for payment status
+    payment_type = models.CharField(max_length=100, choices=[('Credit', 'Credit'), ('Paid', 'Paid in Full')]) 
+    payment_transaction_type = models.CharField(max_length=100, choices=[('Bank Transfer', 'Bank Transfer'), ('Cash', 'Cash')], blank = True, null = True) # New field for payment status
     remark = models.TextField(blank=True, null=True)  # New text field for remarks
     unit_price_before_vat = models.DecimalField(max_digits=10, decimal_places=2)  # Renamed unit price field
     status = models.CharField(max_length=100, choices=[('Finished', 'Finished'), ('Unfinished', 'Unfinished')], blank=True)  # New status field for finished/unfinished
@@ -95,7 +100,7 @@ class Item(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Total price is nullable
     date_of_purchase = models.DateField()
     date_of_bank_transfer = models.DateField(null=True, blank=True)
-    serial_number = models.CharField(max_length=100, unique=True, blank=True)
+    serial_number = models.CharField(max_length=100, blank=True)
     model = models.CharField(max_length=100, blank=True, null=True)  # Make model optional
     color = models.CharField(max_length=100, blank=True, null=True)
     brand = models.CharField(max_length=50, blank=True)
@@ -105,7 +110,9 @@ class Item(models.Model):
     Transferred_from_account_number = models.CharField(max_length=100, blank=True, null=True)
     Transferred_to_receiver_name = models.CharField(max_length=100, blank=True, null=True)
     Transferred_from_sender_name = models.CharField(max_length=100, blank=True, null=True)
-
+    receipt_file = models.FileField(upload_to='uploads/receipts/', blank=True, null=True)
+    bank_transfer_file = models.FileField(upload_to='uploads/', blank=True, null=True)
+    
     def calculate_total_price(self):
         if self.Receipt == 'with':
             return self.unit_price_before_vat * self.quantity * Decimal('1.15')  # Use Decimal here
