@@ -99,8 +99,10 @@ class Item(models.Model):
     seller_name = models.CharField(max_length=100, blank=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Total price is nullable
     date_of_purchase = models.DateField()
+    receipt_status = models.CharField(max_length=50, choices=[('Taken', 'Taken'),('Not Taken', 'Not Taken')], blank = True, null = True)
     date_of_bank_transfer = models.DateField(null=True, blank=True)
-    serial_number = models.CharField(max_length=100, blank=True)
+    serial_number = models.CharField(max_length=100, blank=True, unique = True)
+    item_destination = models.CharField(max_length=50, choices=[('Item Taken', 'Item Taken'),('Item Not Taken', 'Item Not Taken')])
     model = models.CharField(max_length=100, blank=True, null=True)  # Make model optional
     color = models.CharField(max_length=100, blank=True, null=True)
     brand = models.CharField(max_length=50, blank=True)
@@ -110,6 +112,8 @@ class Item(models.Model):
     Transferred_from_account_number = models.CharField(max_length=100, blank=True, null=True)
     Transferred_to_receiver_name = models.CharField(max_length=100, blank=True, null=True)
     Transferred_from_sender_name = models.CharField(max_length=100, blank=True, null=True)
+    USD_rate = models.DecimalField(max_digits=10, decimal_places=2, null =True, blank=True) 
+    total_price_usd = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) 
     receipt_file = models.FileField(upload_to='uploads/receipts/', blank=True, null=True)
     bank_transfer_file = models.FileField(upload_to='uploads/', blank=True, null=True)
     
@@ -121,6 +125,8 @@ class Item(models.Model):
 
     def save(self, *args, **kwargs):
         self.total_price = self.calculate_total_price()  # Automatically calculate total price
+        if self.USD_rate:
+            self.total_price_usd = self.total_price / self.USD_rate 
         super().save(*args, **kwargs)  # Call the parent class's save method to save the object
 
     def __str__(self):
