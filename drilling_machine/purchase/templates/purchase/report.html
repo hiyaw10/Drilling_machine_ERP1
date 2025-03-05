@@ -5,6 +5,7 @@
 <html lang="en">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Purchase Report</title>
@@ -56,10 +57,14 @@
             transition: background-color 0.3s, transform 0.2s;
         }
 
+
+
         .btn-refresh:hover {
             background-color: #546E7A;
             transform: translateY(-2px);
         }
+
+
 
         .btn-add-item {
             background-color: #2196F3; /* Blue */
@@ -132,22 +137,36 @@
             height: auto;
             border-radius: 8px;
         }
+
+        th {
+            cursor: pointer; /* Indicates that the header is clickable */
+        }
+        
+        th i {
+            margin-left: 5px; /* Adds space between the header text and the icon */
+            font-size: 0.8em; /* Makes the icon slightly smaller */
+            color: #666; /* Default icon color */
+        }
+        
+        th i.fa-sort-up, th i.fa-sort-down {
+            color: #007bff; /* Highlight color for active sorting */
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Purchase Report</h2>
-
-        <!-- Total Price Aggregate -->
-        <div class="total-price">
-            Total Spent: <strong>{{ total_spent|intcomma }} ETB</strong>
-        </div>
+        <h2>Purchase Report Page</h2>
 
         <!-- Add Item Button -->
-        <div class="text-center">
-            <a href="{% url 'purchase:add_item' %}" class="btn btn-add-item">Add New Item +</a>
+        <div class="text-center mb-4 d-flex justify-content-center">
+            <a href="{% url 'purchase:add_item' %}" class="btn btn-add-item mr-2">Add New Item +</a>
+            <a href="{% url 'purchase:upload_file' %}" class="btn btn-custom">
+                Upload CSV or Excel<br>
+                <i class="fas fa-file-alt"></i> <!-- General file icon -->
+                <i class="fas fa-file-csv"></i> <!-- CSV file icon -->
+                <i class="fas fa-file-excel"></i> <!-- Excel file icon -->
+            </a>
         </div>
-
         <!-- Filters -->
         <form method="get" class="mb-4">
             <div class="row">
@@ -164,7 +183,7 @@
                     <select name="item_category" id="item_category" class="form-control">
                         <option value="">All</option>
                         {% for category in categories %}
-                            <option value="{{ category }}" {% if request.GET.item_category == category %}selected{% endif %}>{{ category }}</option>
+                            <option value="{{ category }}" {% if request.GET.item_category == categoryq and re %}selected{% endif %}>{{ category }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -208,11 +227,18 @@
             </div>
             <div class="row mt-3">
                 <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-custom">Apply Filters</button>
-                    <a href="{% url 'purchase:generate_report' %}" class="btn btn-refresh">Roll back</a>
+                    <button type="submit" class="btn btn-custom">Generate Report</button>
+                    <a href="{% url 'purchase:generate_report' %}" class="btn btn-refresh">
+                        <i class="fas fa-sync"></i> <!-- Refresh icon -->
+                    </a>
                 </div>
             </div>
         </form>
+
+         <!-- Total Price Aggregate -->
+         <div class="total-price">
+            Report Total Price: <strong>{{ total_spent|intcomma }} ETB</strong>
+        </div>
 
         <!-- Table -->
         <table class="table table-bordered table-hover" id="reportTable">
@@ -292,6 +318,7 @@
                                         <p><strong>Unit:</strong> {{ item.unit }}</p>
                                         <p><strong>Seller Name:</strong> {{ item.seller_name }}</p>
                                         <p><strong>Total Price:</strong> {{ item.total_price|intcomma }} ETB</p>
+                                        <p><strong>Withholding Fee: </strong> {{ item.withholding|intcomma }} ETB</p>
                                         <p><strong>Receipt Status:</strong> {{ item.receipt_status }}</p>
                                     </div>
                                     <div style="float: right; width: 50%;">
@@ -305,7 +332,7 @@
                                         {% if item.payment_transaction_type == "Bank Transfer" %}
                                         <div style="margin-top: 20px;">
                                             <h4 style="font-weight: bold; margin-bottom: 10px;">Bank Details</h4>
-                                            <ul style="list-style-type: disc; margin-left: 20px; font-size: 0.9em;">
+                                            <ul style="list-style-type: disc; margin-left: 22px; font-size: 0.92em;">
                                                 <li><strong>Transferred From Bank Name:</strong> {{ item.Transferred_from_bank_name }}</li>
                                                 <li><strong>Transferred To Bank Name:</strong> {{ item.Transferred_to_bank_name }}</li>
                                                 <li><strong>Transferred From Account Number:</strong> {{ item.Transferred_from_account_number }}</li>
@@ -320,7 +347,7 @@
                                             <!-- Other fields here -->
                                         </div>
                                         <p><strong>1 USD on the day of Purchase:</strong> {{ item.USD_rate|intcomma }} </p>
-                                        <p><strong>Total Price USD:</strong> {{ item.total_price_usd|intcomma }} </p>
+                                        <p><strong>Total Price in USD:</strong> {{ item.total_price_usd|intcomma }} </p>
                                         
                                         <p><strong>Receipt File:</strong>
                                             {% if item.receipt_file %}
@@ -390,6 +417,53 @@
             tbody.innerHTML = "";
             rows.forEach(row => tbody.appendChild(row));
         }
+        let sortStates = Array(10).fill(0); // 0 = default, 1 = ascending, 2 = descending
+let originalRows = []; // Store the original order of rows
+
+function sortTable(columnIndex) {
+    const table = document.getElementById("reportTable");
+    const rows = Array.from(table.querySelectorAll("tbody tr"));
+    const icon = document.getElementById(`sortIcon${columnIndex}`);
+
+    // Store the original order of rows on first click
+    if (originalRows.length === 0) {
+        originalRows = rows.slice(); // Create a copy of the original rows
+    }
+
+    // Cycle through the three states
+    sortStates[columnIndex] = (sortStates[columnIndex] + 1) % 3;
+
+    // Update the icon based on the current state
+    if (sortStates[columnIndex] === 0) {
+        icon.className = "fas fa-sort"; // Default state
+    } else if (sortStates[columnIndex] === 1) {
+        icon.className = "fas fa-sort-up"; // Ascending state
+    } else {
+        icon.className = "fas fa-sort-down"; // Descending state
+    }
+
+    // Sort rows only if not in default state
+    if (sortStates[columnIndex] !== 0) {
+        const direction = sortStates[columnIndex] === 1 ? 1 : -1;
+
+        rows.sort((a, b) => {
+            const aValue = a.cells[columnIndex].textContent.trim();
+            const bValue = b.cells[columnIndex].textContent.trim();
+
+            if (!isNaN(aValue) && !isNaN(bValue)) {
+                return (parseFloat(aValue) - parseFloat(bValue)) * direction; // Numeric comparison
+            } else {
+                return aValue.localeCompare(bValue) * direction; // String comparison
+            }
+        });
+
+        // Re-append sorted rows to the table
+        rows.forEach(row => table.querySelector("tbody").appendChild(row));
+    } else {
+        // Reset to the original order (default state)
+        originalRows.forEach(row => table.querySelector("tbody").appendChild(row));
+    }
+}
     </script>
 </body>
 </html>

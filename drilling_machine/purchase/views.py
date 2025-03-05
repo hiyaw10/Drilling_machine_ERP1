@@ -21,7 +21,68 @@ def add_item(request):
 
     return render(request, 'purchase/add_item.html', {'form': form})
 
+import pandas as pd
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import UploadFileForm
+from .models import Item
 
+def upload_file(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES['file']
+            try:
+                if file.name.endswith('.csv'):
+                    data = pd.read_csv(file)
+                elif file.name.endswith('.xlsx'):
+                    data = pd.read_excel(file)
+                else:
+                    messages.error(request, 'Invalid file format. Please upload a CSV or Excel file.')
+                    return redirect('upload_file')
+
+                # Iterate over the rows and create Purchase objects
+                for index, row in data.iterrows():
+                    Purchase.objects.create(
+                        FS_number=row['FS_number'],
+                        Receipt=row['Receipt'],
+                        item_name=row['item_name'],
+                        custom_item_name=row.get('custom_item_name', ''),
+                        item_category=row['item_category'],
+                        payment_type=row['payment_type'],
+                        payment_transaction_type=row.get('payment_transaction_type', ''),
+                        remark=row.get('remark', ''),
+                        unit_price_before_vat=row['unit_price_before_vat'],
+                        status=row.get('status', ''),
+                        quantity=row['quantity'],
+                        unit=row['unit'],
+                        seller_name=row.get('seller_name', ''),
+                        total_price=row.get('total_price', None),
+                        date_of_purchase=row['date_of_purchase'],
+                        receipt_status=row.get('receipt_status', ''),
+                        date_of_bank_transfer=row.get('date_of_bank_transfer', None),
+                        serial_number=row.get('serial_number', ''),
+                        item_destination=row['item_destination'],
+                        model=row.get('model', ''),
+                        color=row.get('color', ''),
+                        brand=row.get('brand', ''),
+                        Transferred_to_bank_name=row.get('Transferred_to_bank_name', ''),
+                        Transferred_from_bank_name=row.get('Transferred_from_bank_name', ''),
+                        Transferred_to_account_number=row.get('Transferred_to_account_number', ''),
+                        Transferred_from_account_number=row.get('Transferred_from_account_number', ''),
+                        Transferred_to_receiver_name=row.get('Transferred_to_receiver_name', ''),
+                        Transferred_from_sender_name=row.get('Transferred_from_sender_name', ''),
+                        USD_rate=row.get('USD_rate', None),
+                        total_price_usd=row.get('total_price_usd', None)
+                    )
+
+                messages.success(request, 'File uploaded and data imported successfully.')
+            except Exception as e:
+                messages.error(request, f'Error processing file: {str(e)}')
+            return redirect('upload_file')
+    else:
+        form = UploadFileForm()
+    return render(request, 'purchase/upload.html', {'form': form})
 
 # Generate Report View
 from django.shortcuts import render, redirect

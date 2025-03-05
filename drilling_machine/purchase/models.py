@@ -84,11 +84,11 @@ class Item(models.Model):
         ('Other', 'Other'),
     ]
     
-    FS_number = models.CharField(max_length=100)  # New field for FS number
+    FS_number = models.CharField(max_length=100, blank=True, null=True)  # New field for FS number
     Receipt= models.CharField(max_length=100, choices=CATEGORY_CHOICES)
     item_name = models.CharField(max_length=100, choices=CATEGORY_NAME_CHOICES)  # Updated field name
     custom_item_name = models.CharField(max_length=100, blank = True)  # New field for custom name
-    item_category = models.CharField(max_length=50, choices=ITEM_CATEGORY_CHOICES)  # Renamed field for clarity
+    item_category = models.CharField(max_length=50, choices=ITEM_CATEGORY_CHOICES, blank=True, null=True)  # Renamed field for clarity
     payment_type = models.CharField(max_length=100, choices=[('Credit', 'Credit'), ('Paid', 'Paid in Full')]) 
     payment_transaction_type = models.CharField(max_length=100, choices=[('Bank Transfer', 'Bank Transfer'), ('Cash', 'Cash')], blank = True, null = True) # New field for payment status
     remark = models.TextField(blank=True, null=True)  # New text field for remarks
@@ -101,11 +101,11 @@ class Item(models.Model):
     date_of_purchase = models.DateField()
     receipt_status = models.CharField(max_length=50, choices=[('Taken', 'Taken'),('Not Taken', 'Not Taken')], blank = True, null = True)
     date_of_bank_transfer = models.DateField(null=True, blank=True)
-    serial_number = models.CharField(max_length=100, blank=True, unique = True)
-    item_destination = models.CharField(max_length=50, choices=[('Item Taken', 'Item Taken'),('Item Not Taken', 'Item Not Taken')])
+    serial_number = models.CharField(max_length=100, blank=True, null = True)
+    item_destination = models.CharField(max_length=50, choices=[('Item Taken', 'Item Taken'),('Item Not Taken', 'Item Not Taken')], blank=True, null=True)
     model = models.CharField(max_length=100, blank=True, null=True)  # Make model optional
     color = models.CharField(max_length=100, blank=True, null=True)
-    brand = models.CharField(max_length=50, blank=True)
+    brand = models.CharField(max_length=50, blank=True, null = True)
     Transferred_to_bank_name = models.CharField(max_length=30, choices=BANK_CHOICES, blank=True, null=True)
     Transferred_from_bank_name = models.CharField(max_length=30, choices=BANK_CHOICES, blank=True, null=True)
     Transferred_to_account_number = models.CharField(max_length=100, blank=True, null=True)
@@ -114,6 +114,7 @@ class Item(models.Model):
     Transferred_from_sender_name = models.CharField(max_length=100, blank=True, null=True)
     USD_rate = models.DecimalField(max_digits=10, decimal_places=2, null =True, blank=True) 
     total_price_usd = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) 
+    withholding = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     receipt_file = models.FileField(upload_to='uploads/receipts/', blank=True, null=True)
     bank_transfer_file = models.FileField(upload_to='uploads/', blank=True, null=True)
     
@@ -127,6 +128,11 @@ class Item(models.Model):
         self.total_price = self.calculate_total_price()  # Automatically calculate total price
         if self.USD_rate:
             self.total_price_usd = self.total_price / self.USD_rate 
+        potential_withholding = self.quantity * self.unit_price_before_vat
+        if potential_withholding >= Decimal('10000'):
+            self.withholding = potential_withholding * Decimal('0.02')
+        else:
+            self.withholding = 0
         super().save(*args, **kwargs)  # Call the parent class's save method to save the object
 
     def __str__(self):
