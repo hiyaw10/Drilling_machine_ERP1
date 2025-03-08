@@ -385,85 +385,63 @@
 
     <!-- Sorting Script -->
     <script>
-        let sortAsc = true;
-
+        let sortStates = Array(10).fill(0); // 0 = default, 1 = ascending, 2 = descending
+        let originalRows = []; // Store the original order of rows
+    
         function sortTable(columnIndex) {
             const table = document.getElementById("reportTable");
-            const rows = Array.from(table.getElementsByTagName("tr")).slice(1); // Skip header row
-
-            rows.sort((a, b) => {
-                const aValue = a.getElementsByTagName("td")[columnIndex].textContent.trim();
-                const bValue = b.getElementsByTagName("td")[columnIndex].textContent.trim();
-
-                if (!isNaN(aValue) && !isNaN(bValue)) {
-                    return sortAsc ? aValue - bValue : bValue - aValue;
-                } else {
-                    return sortAsc ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-                }
-            });
-
-            // Toggle sorting order
-            sortAsc = !sortAsc;
-
-            // Update sorting indicator
-            const headers = table.getElementsByTagName("th");
-            for (let i = 0; i < headers.length; i++) {
-                headers[i].classList.remove("sort-asc", "sort-desc");
+            const rows = Array.from(table.querySelectorAll("tbody tr"));
+            const icon = document.getElementById(`sortIcon${columnIndex}`);
+            for (let i = 0; i <= 9; i++) {
+                document.getElementById(`sortIcon${i}`).className = "fas fa-sort";
             }
-            headers[columnIndex].classList.add(sortAsc ? "sort-asc" : "sort-desc");
-
-            // Rebuild the table
-            const tbody = table.getElementsByTagName("tbody")[0];
-            tbody.innerHTML = "";
-            rows.forEach(row => tbody.appendChild(row));
-        }
-        let sortStates = Array(10).fill(0); // 0 = default, 1 = ascending, 2 = descending
-let originalRows = []; // Store the original order of rows
-
-function sortTable(columnIndex) {
-    const table = document.getElementById("reportTable");
-    const rows = Array.from(table.querySelectorAll("tbody tr"));
-    const icon = document.getElementById(`sortIcon${columnIndex}`);
-
-    // Store the original order of rows on first click
-    if (originalRows.length === 0) {
-        originalRows = rows.slice(); // Create a copy of the original rows
-    }
-
-    // Cycle through the three states
-    sortStates[columnIndex] = (sortStates[columnIndex] + 1) % 3;
-
-    // Update the icon based on the current state
-    if (sortStates[columnIndex] === 0) {
-        icon.className = "fas fa-sort"; // Default state
-    } else if (sortStates[columnIndex] === 1) {
-        icon.className = "fas fa-sort-up"; // Ascending state
-    } else {
-        icon.className = "fas fa-sort-down"; // Descending state
-    }
-
-    // Sort rows only if not in default state
-    if (sortStates[columnIndex] !== 0) {
-        const direction = sortStates[columnIndex] === 1 ? 1 : -1;
-
-        rows.sort((a, b) => {
-            const aValue = a.cells[columnIndex].textContent.trim();
-            const bValue = b.cells[columnIndex].textContent.trim();
-
-            if (!isNaN(aValue) && !isNaN(bValue)) {
-                return (parseFloat(aValue) - parseFloat(bValue)) * direction; // Numeric comparison
+        
+            // Toggle sorting for the clicked column
+            let sortIcon = document.getElementById(`sortIcon${columnIndex}`);
+            if (sortIcon.classList.contains("fa-sort") || sortIcon.classList.contains("fa-sort-down")) {
+                sortIcon.className = "fas fa-sort-up"; // Ascending
             } else {
-                return aValue.localeCompare(bValue) * direction; // String comparison
+                sortIcon.className = "fas fa-sort-down"; // Descending
             }
-        });
-
-        // Re-append sorted rows to the table
-        rows.forEach(row => table.querySelector("tbody").appendChild(row));
-    } else {
-        // Reset to the original order (default state)
-        originalRows.forEach(row => table.querySelector("tbody").appendChild(row));
-    }
-}
+        
+            // Store original order only on the first click
+            if (originalRows.length === 0) {
+                originalRows = rows.slice(); // Copy original rows
+            }
+    
+            // Cycle through three states (default, ascending, descending)
+            sortStates[columnIndex] = (sortStates[columnIndex] + 1) % 3;
+    
+            // Update sorting icon
+            icon.className = sortStates[columnIndex] === 0 ? "fas fa-sort"
+                : sortStates[columnIndex] === 1 ? "fas fa-sort-up"
+                : "fas fa-sort-down";
+    
+            if (sortStates[columnIndex] !== 0) {
+                const direction = sortStates[columnIndex] === 1 ? 1 : -1;
+    
+                rows.sort((a, b) => {
+                    const aValue = a.cells[columnIndex].textContent.trim();
+                    const bValue = b.cells[columnIndex].textContent.trim();
+    
+                    // Check if values are numbers
+                    const aNum = parseFloat(aValue);
+                    const bNum = parseFloat(bValue);
+                    const isNumeric = !isNaN(aNum) && !isNaN(bNum);
+    
+                    return isNumeric 
+                        ? (aNum - bNum) * direction  // Numeric comparison
+                        : aValue.localeCompare(bValue) * direction; // String comparison
+                });
+    
+                // Append sorted rows
+                rows.forEach(row => table.querySelector("tbody").appendChild(row));
+            } else {
+                // Reset to original order
+                originalRows.forEach(row => table.querySelector("tbody").appendChild(row));
+            }
+        }
     </script>
+    
 </body>
 </html>

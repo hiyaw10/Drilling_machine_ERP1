@@ -84,7 +84,7 @@ class Item(models.Model):
         ('Other', 'Other'),
     ]
     
-    FS_number = models.CharField(max_length=100, blank=True, null=True)  # New field for FS number
+    FS_number = models.IntegerField(blank=True, null=True)  # New field for FS number
     Receipt= models.CharField(max_length=100, choices=CATEGORY_CHOICES)
     item_name = models.CharField(max_length=100, choices=CATEGORY_NAME_CHOICES)  # Updated field name
     custom_item_name = models.CharField(max_length=100, blank = True)  # New field for custom name
