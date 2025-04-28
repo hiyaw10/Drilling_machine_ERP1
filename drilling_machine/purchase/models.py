@@ -90,7 +90,7 @@ class Item(models.Model):
     custom_item_name = models.CharField(max_length=100, blank = True)  # New field for custom name
     item_category = models.CharField(max_length=50, choices=ITEM_CATEGORY_CHOICES, blank=True, null=True)  # Renamed field for clarity
     payment_type = models.CharField(max_length=100, choices=[('Credit', 'Credit'), ('Paid', 'Paid in Full')]) 
-    payment_transaction_type = models.CharField(max_length=100, choices=[('Bank Transfer', 'Bank Transfer'), ('Cash', 'Cash')], blank = True, null = True) # New field for payment status
+    payment_transaction_type = models.CharField(max_length=100, choices=[('Bank Transfer', 'Bank Transfer'), ('Cash', 'Cash'), ('Deposit to Bank','Deposit to Bank')], blank = True, null = True) # New field for payment status
     remark = models.TextField(blank=True, null=True)  # New text field for remarks
     unit_price_before_vat = models.DecimalField(max_digits=10, decimal_places=2)  # Renamed unit price field
     status = models.CharField(max_length=100, choices=[('Finished', 'Finished'), ('Unfinished', 'Unfinished')], blank=True)  # New status field for finished/unfinished
